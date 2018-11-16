@@ -1,6 +1,6 @@
 import { nth, upperFirst } from "lodash/fp"
 import { maybe, oneOf, evaluate } from "./dsl"
-import { prependAll } from "./util"
+import { prependAll, wordList } from "./util"
 
 const firstNames = [
   ["Harald", "Haraldin"],
@@ -112,12 +112,9 @@ const adjectives = [
   ["liekitetty", "liekitetyt", "liekitettyä", "liekitettyjä"],
   ["ihanampi", "ihanammat", "ihanampaa", "ihanampia"],
   prependAll(maybe(marinade), ["marinoitu", "marinoidut", "marinoitua", "marinoituja"]),
-  ["paahdettu", "paahdetut", "paahdettua", "paahdettuja"],
   ["kuivattu", "kuivatut", "kuivattua", "kuivattuja"],
   ["karamellisoitu", "karamellisoidut", "karamellisoitua", "karamellisoituja"],
   ["ylikypsä", "ylikypsät", "ylikypsää", "ylikypsiä"],
-  ["revitty", "revityt", "revittyä", "revittyjä"],
-  ["pariloitu", "pariloidut", "pariloitua", "pariloituja"],
   ["kuorrutettu", "kuorrutetut", "kuorttutettua", "kuorrutettuja"]
 ]
 
@@ -236,7 +233,7 @@ const sauceModifier = oneOf(...sauceModifiers.map(nth(0)))
 const sauceModifierPartitive = oneOf(...sauceModifiers.map(nth(1)))
 const sauceModifierAdessive = oneOf(...sauceModifiers.map(nth(2)))
 
-const baseSauces = [
+const [baseSauce, baseSaucePartitive, baseSauceAdessive] = wordList([
   ["kasti", "kastia", "kastilla"],
   ["kastike", "kastiketta", "kastikkeella"],
   ["liemi", "lientä", "liemellä"],
@@ -245,12 +242,8 @@ const baseSauces = [
   ["pyree", "pyreetä", "pyreellä"],
   ["vaahto", "vaahtoa", "vaahdolla"],
   ["dippi", "dippiä", "dipillä"],
-  ["hilloke", "hilloketta", "hillokkeella"]
-]
-
-const baseSauce = oneOf(...baseSauces.map(nth(0)))
-const baseSaucePartitive = oneOf(...baseSauces.map(nth(1)))
-const baseSauceAdessive = oneOf(...baseSauces.map(nth(2)))
+  ["hilloke", "hilloketta", "hillokkeella"],
+])
 
 const sauceIngredient = oneOf(mainIngredient, oneOf(
   "tomaatti",
@@ -278,19 +271,31 @@ const sauce = oneOf(
   [" ", maybe([foodSourceP, " "]), maybe([sauceModifierAdessive, " "]), maybe(ingredientModifier), maybe(sauceIngredient), baseSauceAdessive]
 )
 
-const valmistustapa = oneOf("paistettua", "keitettyä", "suurustettua", "suolattua", "höyrytetty", "nuotiolla paistettua", "hiillostettua", "savustettua")
+const [cookingMethodSingular, cookingMethodPlural, cookingMethodPartitive, cookingMethodPluralPartitive] = wordList([
+  ["paistettu", "paistetut", "paistettua", "paistettuja"],
+  ["keitetty", "keitetyt", "keitettyä", "keitettyjä"],
+  ["suurustettu", "suurustetut", "suurustettua", "suurustettuja"],
+  ["suolattu", "suolatut", "suolattua", "suolattuja"],
+  ["höyrytetty", "höyrytetyt", "höyrytettyä", "höyrytettyjä"],
+  ["nuotiolla paistettu", "nuotiolla paistetut", "nuotiolla paistettua", "nautiolla paistettuja"],
+  ["hiillostettu", "hiillostetut", "hiillostettua", "hiillostettuja"],
+  ["savustettu", "savustetut", "savustettua", "savustettuja"],
+  ["revitty", "revityt", "revittyä", "revittyjä"],
+  ["pariloitu", "pariloidut", "pariloitua", "pariloituja"],
+  ["paahdettu", "paahdetut", "paahdettua", "paahdettuja"]
+])
 
 const meal = [oneOf(
-  [maybe([adjectiveSingular, " "]), mealPart],
-  [maybe([adjectivePlural, " "]), mealPartPlural],
-  [valmistustapa, " ", maybe([adjectivePartitive, " "]), mealPartPartitive],
-  [maybe([adjectivePluralPartitive, " "]), mealPartPluralPartitive],
+  [maybe([cookingMethodSingular, " "]), maybe([adjectiveSingular, " "]), mealPart],
+  [maybe([cookingMethodPlural, " "]), maybe([adjectivePlural, " "]), mealPartPlural],
+  [maybe([cookingMethodPartitive, " "]), maybe([adjectivePartitive, " "]), mealPartPartitive],
+  [maybe([cookingMethodPluralPartitive, " "]), maybe([adjectivePluralPartitive, " "]), mealPartPluralPartitive],
 ), maybe(sauce)]
 
 const pattern = oneOf(
   [maybe([foodSourceP, " "]), meal, " sekä ", maybe([foodSourceP, " "]), meal],
   [fullNameP, " ", meal],
-  [meal, " ", foodSourceP, " ", oneOf("tapaan", "hovista", "nuotiolta", "leiristä")],
+  [meal, " ", foodSourceP, " ", oneOf("tapaan", "tyyliin", "hovista", "nuotiolta", "leiristä")],
   [meal, " á la ", foodSource]
 )
 
