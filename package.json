@@ -1,0 +1,17 @@
+{
+  "name": "textgen",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "./node_modules/.bin/parcel ./src/main.html",
+    "deploy": "./deploy.sh"
+  },
+  "dependencies": {
+    "@babel/core": "7.1.6",
+    "@babel/preset-env": "7.1.6",
+    "babel-loader": "8.0.4",
+    "lodash": "4.17.11",
+    "parcel": "1.10.3"
+  }
+}
