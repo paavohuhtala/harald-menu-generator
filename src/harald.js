@@ -1,6 +1,6 @@
 import { nth, upperFirst } from "lodash/fp"
 import { maybe, oneOf, evaluate } from "./dsl"
-import { prependAll, wordList } from "./util"
+import { prependAll, wordList, __ } from "./util"
 
 const firstNames = [
   ["Harald", "Haraldin"],
@@ -106,7 +106,6 @@ const adjectives = [
   ["juhlallinen", "juhlalliset", "juhlallista", "juhlallisia"],
   ["parempi", "paremmat", "parempaa", "parempia"],
   ["herkullinen", "herkulliset", "herkullista", "herkullisia"],
-  ["suolattu", "suolatut", "suolattua", "suolattuja"],
   ["pikkelöity", "pikkelöidyt", "pikkelöityä", "pikkelöityjä"],
   ["friteerattu", "friteeratut", "friteerattua", "friteerattuja"],
   ["liekitetty", "liekitetyt", "liekitettyä", "liekitettyjä"],
@@ -115,7 +114,7 @@ const adjectives = [
   ["kuivattu", "kuivatut", "kuivattua", "kuivattuja"],
   ["karamellisoitu", "karamellisoidut", "karamellisoitua", "karamellisoituja"],
   ["ylikypsä", "ylikypsät", "ylikypsää", "ylikypsiä"],
-  ["kuorrutettu", "kuorrutetut", "kuorttutettua", "kuorrutettuja"]
+  ["kuorrutettu", "kuorrutetut", "kuorrutettua", "kuorrutettuja"]
 ]
 
 const adjectiveSingular = oneOf(...adjectives.map(nth(0)))
@@ -133,6 +132,9 @@ const mainIngredients = [
   ["silli", "silli"],
   ["särki", "särkeä"],
   ["turska", "turskaa"],
+  ["kolja", "koljaa"],
+  ["hummeri", "hummeria"],
+  ["kaviaari", "kaviaari"],
   ["mäti", "mätiä"],
   ["lahna", "lahnaa"],
   ["tofu", "tofua"],
@@ -167,54 +169,41 @@ const ingredientModifier = oneOf(
 const mainIngredient = [maybe(ingredientModifier), oneOf(...mainIngredients.map(nth(0)))]
 const mainIngredientPartitive = [maybe(ingredientModifier), oneOf(...mainIngredients.map(nth(1)))]
 
-const mealParts = [
-  prependAll(mainIngredient, ["kiusaus", "kiusausta"]),
-  prependAll(mainIngredient, ["laatikko", "laatikkoa"]),
-  prependAll(maybe(mainIngredient), ["makkara", "makkaraa"]),
-  prependAll(maybe(mainIngredient), ["hampurilainen", "hampurilaista"]),
-  prependAll(mainIngredient, ["keitto", "keittoa"]),
-  prependAll(mainIngredient, ["pihvi", "pihviä"]),
-  prependAll(mainIngredient, ["kakku", "kakkua"]),
-  prependAll(mainIngredient, ["salaatti", "salaattia"]),
-  prependAll(mainIngredient, ["rulla", "rullaa"]),
-  prependAll(maybe(mainIngredient), ["paisti", "paistia"]),
-  prependAll(maybe(mainIngredient), ["kebab", "kebabia"]),
-  prependAll(mainIngredient, ["muhennos", "muhennosta"]),
-  ["leike", "leikettä"],
-  ["perunamuusi", "perunamuusia"],
-  ["murskattu peruna", "murskattua perunaa"],
-  ["viiriäinen", "viiriäistä"],
-  ["leipäjuusto", "leipäjuustoa"],
-  ["peruna", "perunaa"],
-  ["lanttu", "lanttua"],
-  ["palsternakka", "palsternakkaa"],
-  ["lehtikaali", "lehtikaalta"],
-  ["lammassärä", "lammassärää"],
-  ["ankankoipi", "ankankoipea"],
-  [mainIngredient, mainIngredientPartitive]
-]
-
-const mealPart = oneOf(...mealParts.map(nth(0)))
-const mealPartPartitive = oneOf(...mealParts.map(nth(1)))
-
-const pluralMealParts = [
-  prependAll(oneOf("liha", mainIngredient), ["pullat", "pullia"]),
-  prependAll(mainIngredient, ["rullat", "rullia"]),
-  prependAll(mainIngredient, ["pihvit", "pihvejä"]),
-  ["nakit", "nakkeja"],
-  ["ranskalaiset", "ranskalaisia"],
-  ["tikkuperunat", "tikkuperunoita"],
-  ["kilpiperunat", "kilpiperunoita"],
-  ["lohkoperunat", "lohkoperunoita"],
-  ["pihvit", "pihvejä"],
-  ["ravunpyrstöt", "ravunpyrstöjä"],
-  ["järvisimpukat", "järvisimpukoita"],
-  ["muikut", "muikkuja"],
-  prependAll(maybe(mainIngredient), ["leivät", "leipiä"])
-]
-
-const mealPartPlural = oneOf(...pluralMealParts.map(nth(0)))
-const mealPartPluralPartitive = oneOf(...pluralMealParts.map(nth(1)))
+const [mealPart, mealPartPartitive, mealPartPlural, mealPartPluralPartitive] = wordList([
+  prependAll(mainIngredient, ["kiusaus", "kiusausta", __, __]),
+  prependAll(mainIngredient, ["laatikko", "laatikkoa", __, __]),
+  prependAll(maybe(mainIngredient), ["makkara", "makkaraa", "makkarat", "makkaroita"]),
+  prependAll(maybe(mainIngredient), ["hampurilainen", "hampurilaista", __, __]),
+  prependAll(mainIngredient, ["keitto", "keittoa", __, __]),
+  prependAll(mainIngredient, ["pihvi", "pihviä", "pihvit", "pihvejä"]),
+  prependAll(mainIngredient, ["kakku", "kakkua", "kakut", "kakkuja"]),
+  prependAll(maybe(mainIngredient), ["salaatti", "salaattia", __, __]),
+  prependAll(mainIngredient, ["rulla", "rullaa", __, __]),
+  prependAll(maybe(mainIngredient), ["paisti", "paistia", __, __]),
+  prependAll(maybe(mainIngredient), ["kebab", "kebabia", __, __]),
+  prependAll(mainIngredient, ["muhennos", "muhennosta", __, __]),
+  prependAll(oneOf("liha", mainIngredient), ["pulla", "pullaa", "pullat", "pullia"]),
+  ["leike", "leikettä", "leikkeet", "leikkeitä"],
+  ["perunamuusi", "perunamuusia", __, __],
+  ["murskattu peruna", "murskattua perunaa", "murskatut perunat", "murskattuja perunoita"],
+  ["viiriäinen", "viiriäistä", "viiriäisenkoivet", "viiriäisenkoipia"],
+  ["leipäjuusto", "leipäjuustoa", __, __],
+  ["peruna", "perunaa", "perunat", "perunoita"],
+  ["lanttu", "lanttua", "lantut", "lanttuja"],
+  ["palsternakka", "palsternakkaa", "palsternakat", "palsternakkoja"],
+  ["lehtikaali", "lehtikaalta", __, __],
+  ["lammassärä", "lammassärää", __, __],
+  ["ankankoipi", "ankankoipea", "ankankoivet", "ankankoipia"],
+  prependAll(maybe(mainIngredient), [__, __, "nakit", "nakkeja"]),
+  prependAll(maybe(oneOf("juures", "bataatti", "maalais", "ristikko")), [__, __, "ranskalaiset", "ranskalaisia"]),
+  [__, __, "tikkuperunat", "tikkuperunoita"],
+  [__, __, "kilpiperunat", "kilpiperunoita"],
+  [__, __, "lohkoperunat", "lohkoperunoita"],
+  [__, __, "ravunpyrstöt", "ravunpyrstöjä"],
+  [__, __, "järvisimpukat", "järvisimpukoita"],
+  [__, __, "muikut", "muikkuja"],
+  [mainIngredient, mainIngredientPartitive, __, __]
+])
 
 const sauceModifiers = [
   ["juustoinen", "juustoista", "juustoisella"],
@@ -262,11 +251,12 @@ const sauceIngredient = oneOf(mainIngredient, oneOf(
   "herukka",
   "vaahterasiirappi",
   "rosmariini",
-  "sinappi"
+  "sinappi",
+  "voi"
 ))
 
 const sauce = oneOf(
-  [" ja ", maybe([foodSourceP, " "]),  maybe([sauceModifierPartitive, " "]), maybe(ingredientModifier), maybe(sauceIngredient), baseSaucePartitive],
+  [" ja ", maybe([foodSourceP, " "]), maybe([sauceModifierPartitive, " "]), maybe(ingredientModifier), maybe(sauceIngredient), baseSaucePartitive],
   [" ja ", maybe([foodSourceP, " "]), maybe([sauceModifier, " "]), maybe(ingredientModifier), maybe(sauceIngredient), baseSauce],
   [" ", maybe([foodSourceP, " "]), maybe([sauceModifierAdessive, " "]), maybe(ingredientModifier), maybe(sauceIngredient), baseSauceAdessive]
 )
@@ -274,7 +264,6 @@ const sauce = oneOf(
 const [cookingMethodSingular, cookingMethodPlural, cookingMethodPartitive, cookingMethodPluralPartitive] = wordList([
   ["paistettu", "paistetut", "paistettua", "paistettuja"],
   ["keitetty", "keitetyt", "keitettyä", "keitettyjä"],
-  ["suurustettu", "suurustetut", "suurustettua", "suurustettuja"],
   ["suolattu", "suolatut", "suolattua", "suolattuja"],
   ["höyrytetty", "höyrytetyt", "höyrytettyä", "höyrytettyjä"],
   ["nuotiolla paistettu", "nuotiolla paistetut", "nuotiolla paistettua", "nautiolla paistettuja"],

@@ -1,5 +1,7 @@
 import { oneOf } from "./dsl"
-import { unzip } from "lodash/fp"
+import { unzip, reject, eq } from "lodash/fp"
 
-export const prependAll = (pre, arr) => arr.map(x => [pre, x])
-export const wordList = ls => unzip(ls).map(words => oneOf(...words))
+export const __ = Symbol("placeholder")
+
+export const prependAll = (pre, arr) => arr.map(x => x == __ ? __ : [pre, x])
+export const wordList = ls => unzip(ls).map(words => oneOf(...reject(eq(__), words)))
