@@ -2,7 +2,7 @@ import { nth, upperFirst } from "lodash/fp"
 import { maybe, oneOf, evaluate } from "./dsl"
 import { prependAll, wordList, __ } from "./util"
 
-const firstNames = [
+const [firstName, firstNameP] = wordList([
   ["Harald", "Haraldin"],
   ["Helga", "Helgan"],
   ["Sven", "Svenin"],
@@ -27,10 +27,7 @@ const firstNames = [
   ["Peppi", "Pepin"],
   ["Eemil", "Eemilin"],
   ["Eemeli", "Eemelin"]
-]
-
-const firstName = oneOf(...firstNames.map(nth(0)))
-const firstNameP = oneOf(...firstNames.map(nth(1)))
+])
 
 const title = oneOf(
   "tietäjä",
@@ -63,7 +60,7 @@ const fullNameP = oneOf(
   [maybe([title, " "]), firstName, " ", firstNameP, oneOf("pojan", "tyttären")]
 )
 
-const foodSources = [
+const [foodSource, foodSourceP] = wordList([
   [fullName, fullNameP],
   ["Tuonela", "Tuonelan"],
   ["Aifur", "Aifurin"],
@@ -86,10 +83,7 @@ const foodSources = [
   ["Kapteeni", "Kapteenin"],
   ["Shamaani", "Shamaanin"],
   ["Teurastaja", "Teurastajan"]
-]
-
-const foodSource = oneOf(...foodSources.map(nth(0)))
-const foodSourceP = oneOf(...foodSources.map(nth(1)))
+])
 
 const marinade = oneOf(
   "olut",
@@ -98,7 +92,7 @@ const marinade = oneOf(
   "viini"
 )
 
-const adjectives = [
+const [adjectiveSingular, adjectivePlural, adjectivePartitive, adjectivePluralPartitive] = wordList([
   ["valtava", "valtavat", "valtavaa", "valtavia"],
   ["mahtava", "mahtavat", "mahtavaa", "mahtavia"],
   ["reilu", "reilut", "reilua", "reiluja"],
@@ -115,12 +109,7 @@ const adjectives = [
   ["karamellisoitu", "karamellisoidut", "karamellisoitua", "karamellisoituja"],
   ["ylikypsä", "ylikypsät", "ylikypsää", "ylikypsiä"],
   ["kuorrutettu", "kuorrutetut", "kuorrutettua", "kuorrutettuja"]
-]
-
-const adjectiveSingular = oneOf(...adjectives.map(nth(0)))
-const adjectivePlural = oneOf(...adjectives.map(nth(1)))
-const adjectivePartitive = oneOf(...adjectives.map(nth(2)))
-const adjectivePluralPartitive = oneOf(...adjectives.map(nth(3)))
+])
 
 const mainIngredients = [
   ["kinkku", "kinkkua"],
@@ -145,7 +134,6 @@ const mainIngredients = [
   ["lammas", "lammasta"],
   ["kauris", "kaurista"],
   ["rapu", "rapua"],
-  ["hevosenfilee", "hevosta"],
   ["härkä", "härkää"],
   ["juusto", "juustoa"],
   ["kalkkuna", "kalkkunaa"],
@@ -183,6 +171,7 @@ const [mealPart, mealPartPartitive, mealPartPlural, mealPartPluralPartitive] = w
   prependAll(maybe(mainIngredient), ["kebab", "kebabia", __, __]),
   prependAll(mainIngredient, ["muhennos", "muhennosta", __, __]),
   prependAll(oneOf("liha", mainIngredient), ["pulla", "pullaa", "pullat", "pullia"]),
+  ["rosvopaisti", "rosvopaistia", __, __],
   ["leike", "leikettä", "leikkeet", "leikkeitä"],
   ["perunamuusi", "perunamuusia", __, __],
   ["murskattu peruna", "murskattua perunaa", "murskatut perunat", "murskattuja perunoita"],
@@ -200,12 +189,12 @@ const [mealPart, mealPartPartitive, mealPartPlural, mealPartPluralPartitive] = w
   [__, __, "kilpiperunat", "kilpiperunoita"],
   [__, __, "lohkoperunat", "lohkoperunoita"],
   [__, __, "ravunpyrstöt", "ravunpyrstöjä"],
-  [__, __, "järvisimpukat", "järvisimpukoita"],
+  prependAll(oneOf("järvi", "joki", "sini"), ["simpukka", "simpukkaa", "simpukat", "simpukoita"]),
   [__, __, "muikut", "muikkuja"],
   [mainIngredient, mainIngredientPartitive, __, __]
 ])
 
-const sauceModifiers = [
+const [sauceModifier, sauceModifierPartitive, sauceModifierAdessive] = wordList([
   ["juustoinen", "juustoista", "juustoisella"],
   ["tulinen", "tulista", "tulisella"],
   ["pippurinen", "pippurista", "pippurisella"]
@@ -216,11 +205,7 @@ const sauceModifiers = [
   ["terästetty", "terästettyä", "terätetyllä"],
   ["kesäinen", "kesäistä", "kesäisellä"],
   ["jouluinen", "jouluista", "jouluisella"]
-]
-
-const sauceModifier = oneOf(...sauceModifiers.map(nth(0)))
-const sauceModifierPartitive = oneOf(...sauceModifiers.map(nth(1)))
-const sauceModifierAdessive = oneOf(...sauceModifiers.map(nth(2)))
+])
 
 const [baseSauce, baseSaucePartitive, baseSauceAdessive] = wordList([
   ["kasti", "kastia", "kastilla"],
@@ -246,13 +231,17 @@ const sauceIngredient = oneOf(mainIngredient, oneOf(
   "oravanmarja",
   "kuusenkerkkä",
   "katajanmarja",
+  "pihlajanmarja",
   "olut",
   "viini",
   "herukka",
   "vaahterasiirappi",
   "rosmariini",
   "sinappi",
-  "voi"
+  "voi",
+  "herkkusieni",
+  "tatti",
+  "korvasieni"
 ))
 
 const sauce = oneOf(
