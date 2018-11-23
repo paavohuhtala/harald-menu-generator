@@ -255,7 +255,7 @@ const [cookingMethodSingular, cookingMethodPlural, cookingMethodPartitive, cooki
   ["keitetty", "keitetyt", "keitettyä", "keitettyjä"],
   ["suolattu", "suolatut", "suolattua", "suolattuja"],
   ["höyrytetty", "höyrytetyt", "höyrytettyä", "höyrytettyjä"],
-  ["nuotiolla paistettu", "nuotiolla paistetut", "nuotiolla paistettua", "nautiolla paistettuja"],
+  ["nuotiolla paistettu", "nuotiolla paistetut", "nuotiolla paistettua", "nuotiolla paistettuja"],
   ["hiillostettu", "hiillostetut", "hiillostettua", "hiillostettuja"],
   ["savustettu", "savustetut", "savustettua", "savustettuja"],
   ["revitty", "revityt", "revittyä", "revittyjä"],
