@@ -1,5 +1,6 @@
 
 import { generateMeal } from "./harald"
+import { generatePresentation } from "./pohina"
 
 document.addEventListener("DOMContentLoaded", () => {
   const resultsUl = document.getElementById("results")
@@ -8,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     resultsUl.innerHTML = ""
     for (let i = 0; i < 10; i++) {
       const elem = document.createElement("li")
-      elem.innerText = generateMeal()
+      elem.innerText = generatePresentation()
       resultsUl.appendChild(elem)
     }
   }
