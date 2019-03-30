@@ -1,4 +1,4 @@
-import { shuffle, isFunction, isString, isArray } from "lodash/fp"
+import { zip, concat, shuffle, isFunction, isString, isArray } from "lodash/fp"
 
 export const oneOf = (...items) => {
   let available = []
@@ -19,7 +19,7 @@ export const oneOf = (...items) => {
 }
 
 
-export const maybe = x => () => oneOf(x, "")
+export const maybe = x => oneOf(x, "")
 export const compose = (f, pattern) => () => f(pattern())
 export const pipe = (pattern, f) => compose(f, pattern)
 
@@ -32,3 +32,6 @@ export const evaluate = x => {
     return x.map(evaluate).join("")
   }
 }
+
+export const t = (strings, ...exprs) =>
+  zip(strings, exprs).reduce(concat, [])
