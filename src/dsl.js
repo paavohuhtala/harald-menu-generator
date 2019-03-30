@@ -1,6 +1,24 @@
-import { sample, isFunction, isString, isArray } from "lodash/fp"
+import { shuffle, isFunction, isString, isArray } from "lodash/fp"
 
-export const oneOf = (...arr) => () => sample(arr)
+export const oneOf = (...items) => {
+  let available = []
+  
+  const reset = () => {
+    available = shuffle(items)
+  }
+
+  const pickOne = () => {
+    if (available.length === 0) {
+      reset()
+    }
+
+    return available.pop()
+  }
+
+  return pickOne
+}
+
+
 export const maybe = x => () => oneOf(x, "")
 export const compose = (f, pattern) => () => f(pattern())
 export const pipe = (pattern, f) => compose(f, pattern)

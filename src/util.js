@@ -7,7 +7,7 @@ export const prependAll = (pre, arr) => arr.map(x => x == __ ? __ : [pre, x])
 export const wordList = ls => unzip(ls).map(words => oneOf(...reject(eq(__), words)))
 
 export const sepBy = (x, arr) => () => arr.join(x)
-export const nOf = (n, arr) => console.log(shuffle(arr).slice(0, n)) || shuffle(arr).slice(0, n)
+export const nOf = (n, arr) => shuffle(arr).slice(0, n)
 
 export const natList = (sep, last) => arr => {
   const parts = arr.map(evaluate)
