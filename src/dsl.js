@@ -23,6 +23,8 @@ export const maybe = x => oneOf(x, "")
 export const compose = (f, pattern) => () => f(pattern())
 export const pipe = (pattern, f) => compose(f, pattern)
 
+export const lift = f => x => f(evaluate(x))
+
 export const evaluate = x => {
   if (isFunction(x)) {
     return evaluate(x())

@@ -1,6 +1,7 @@
 import { maybe, oneOf, evaluate, t } from "./dsl"
 import { upperFirst, random, range } from "lodash/fp"
-import { wordList, prependAll, nOf, natListFi } from "./util";
+import { wordList, prependAll, nOf, natListFi } from "./util"
+import { fullName } from "./name"
 
 const maybeWord = x => oneOf(" ", [" ", x, " "])
 
@@ -235,4 +236,6 @@ const pattern = oneOf(
   t`${buzzwords} ${situationSuffix}`
 )
 
-export const generatePresentation = () => upperFirst(evaluate(pattern))
+const presentation = t`${pattern}\n${fullName}`
+
+export const generatePresentation = () => upperFirst(evaluate(presentation))
