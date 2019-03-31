@@ -102,6 +102,9 @@ const buzzwordCommon = [
   "Azure",
   "Salesforce",
   "Blockhain",
+  "ITIL 4",
+  "SIAM",
+  "VeriSM",
   tla,
   [oneOf("API", "dev", "AI", "ML", "XML", "JSON", "REST", "SQL", "DB", "SOAP", "SAFE", "ledger", "coin"), "ops"]
 ]
@@ -344,8 +347,6 @@ const titleCase = lift(x => x.split(" ").map(upperFirst).join(" "))
 
 const acronymize = x => () => {
   const fx = evaluate(x)
-
-  console.log(fx)
 
   const acronym = fx.split(" ").map(nth(0)).join("")
   return `${acronym} (${fx})`
