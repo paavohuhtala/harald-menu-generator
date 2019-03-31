@@ -1,67 +1,97 @@
-import { maybe, oneOf, evaluate, t } from "./dsl"
+import { maybe, oneOf, evaluate, t, lift } from "./dsl"
 import { upperFirst, random, range } from "lodash/fp"
-import { wordList, prependAll, nOf, natListFi } from "./util"
+import { wordList, prependAll, nOf, natListFi, mapAll, compoundFi } from "./util"
 import { fullName } from "./name"
 
 const maybeWord = x => oneOf(" ", [" ", x, " "])
 
-const [positiveAdjective, positiveAdjectivePlural, positiveAdjectivePossessive, positiveAdjectivePluralPosessive, positiveAdverb] = wordList([
-  ["kestävä", "kestävät", "kestävän", "kestävien", "kestävästi"],
-  ["skaalautuva", "skaalautuvat", "skaalautuvan", "skaalautuvien", "skaalautuvasti"],
-  ["innovatiivinen", "innovatiiviset", "innovatiivisen", "innovatiivisten", "innovatiivisesti"]
-  ["ketterä", "ketterät", "ketterän", "ketterien", "ketterästi"],
-  ["avoin", "avoimet", "avoimen", "avoimien", "avoimesti"],
-  ["yhteisöllinen", "yhteisölliset", "yhteisöllisen", "yhteisöllisten", "yhteisöllisesti"],
-  ["inhimillinen", "inhimilliset", "inhimillisen", "inhimillisten", "inhimillisesti"],
-  ["ymmärrettävä", "ymmärrettävät", "ymmärrettävän", "ymmärrettävien", "ymmärettävästi"]
+const [positiveAdjective, positiveAdjectivePlural, positiveAdjectivePossessive, positiveAdjectivePluralPosessive, positiveAdverb, positivePartitive, positiveInessive] = wordList([
+  ["kestävä", "kestävät", "kestävän", "kestävien", "kestävästi", "kestävää", "kestävässä"],
+  ["skaalautuva", "skaalautuvat", "skaalautuvan", "skaalautuvien", "skaalautuvasti", "skaalautuvaa", "skaalautuvassa"],
+  ["innovatiivinen", "innovatiiviset", "innovatiivisen", "innovatiivisten", "innovatiivisesti", "innovatiivista", "innovatiivisessa"]
+  ["ketterä", "ketterät", "ketterän", "ketterien", "ketterästi", "ketterää", "ketterässä"],
+  ["avoin", "avoimet", "avoimen", "avoimien", "avoimesti", "avointa", "avoimessa"],
+  ["yhteisöllinen", "yhteisölliset", "yhteisöllisen", "yhteisöllisten", "yhteisöllisesti", "yhteisöllistä", "yhteisöllisessä"],
+  ["inhimillinen", "inhimilliset", "inhimillisen", "inhimillisten", "inhimillisesti", "inhimillistä", "inhimillisessä"],
+  ["ymmärrettävä", "ymmärrettävät", "ymmärrettävän", "ymmärrettävien", "ymmärettävästi", "ymmärrettävää", "ymmärettävässä"],
+  ["tehokas", "tehokkaat", "tehokkaan", "tehokkaiden", "tehokkaasti", "tehokasta", "tehokkaassa"],
+  ["moderni", "modernit", "modernin", "modernien", "modernisti", "modernia", "modernissa"],
+  ["nykyaikainen", "nykyaikaiset", "nykyaikaisen", "nykyaikaisten", "nykyaikaisesti", "nykyaikaista", "nykyaikaisessa"],
+  ["kasvava", "kasvavat", "kasvavan", "kasvavien", "kasvavasti", "kasvavaa", "kasvavassa"],
+  ["digitaalinen", "digitaaliset", "digitaalisen", "digitaalisten", "digitaalisesti", "digitaalista", "digitaalisessa"],
+  ["selkeä", "selkeät", "selkeän", "selkeiden", "selkeästi", "selkeää", "selkeässä"],
 ])
+
+const tla = oneOf(
+  "AI",
+  "ML",
+  "CI",
+  "BS",
+  "XP",
+  "AWS",
+  "API",
+  "JVM",
+  "KPI",
+  "ROI",
+  "SAP",
+  "JVM",
+  "BPA",
+  "SVN",
+  "GNU",
+  "CMDB",
+  "ITSM",
+  "XML",
+  "JSON",
+  "REST",
+  "SQL",
+  "PHP",
+  "JIRA",
+  "SAFE"
+)
 
 const subjectPrefix = oneOf(
   "yritys",
   "talous",
-  "rajapinta-", 
+  "rajapinta", 
   "pilvi",
-  "tietokanta-",
+  "digi",
+  "tietokanta",
   "johtamis",
   "tekoäly",
   "palvelu",
-  "XML-",
-  "REST-",
-  "API-",
-  "GraphQL-",
-  "alusta-",
+  "alusta",
   "kokonais",
   "lohkoketju",
   "mikropalvelu",
   "nanopalvelu",
+  "muutos",
+  [tla, "-"],
+  "GraphQL-",
 )
 
-const [subject, subjectPlural, subjectPossessive, subjectPluralPosessive, toSubject] = wordList([
-  prependAll(oneOf("API-", "rajapinta"), ["talous", "taloudet", "talouden", "talouksien", "talouteen"]),
-  prependAll(maybe(subjectPrefix), ["ekosysteemi", "ekosysteemit", "ekosysteemin", "ekosysteemien", "ekosysteemiin"]),
-  prependAll(maybe(subjectPrefix), ["arkkitehtuuri", "arkkitehtuurit", "arkkitehtuurin", "arkkitehtuurien", "arkkitehtuuriin"]),
-  ["viitekehys", "viitekehykset", "viitekehyksen", "viitekehysten", "viitekehykseen"],
-  ["integraatio", "integraatiot", "integraation", "integraatioiden", "integraatioon"],
-  ["alustatalous", "alustataloudet", "alustatalouden", "alustatalouksien", "alustatalouteen"],
-  ["alusta", "alustat", "alustan", "alustojen", "alustaan"]
+const withPrefix = (prefix, arr) => mapAll(x => compoundFi(prefix, x), arr)
+
+const [subject, subjectPlural, subjectPossessive, subjectPluralPosessive, toSubject, subjectPartitive] = wordList([
+  prependAll(oneOf("API-", "rajapinta", "alusta"), ["talous", "taloudet", "talouden", "talouksien", "talouteen", "taloutta"]),
+  withPrefix(maybe(subjectPrefix), ["ekosysteemi", "ekosysteemit", "ekosysteemin", "ekosysteemien", "ekosysteemiin", "ekosysteemiä"]),
+  withPrefix(maybe(subjectPrefix), ["arkkitehtuuri", "arkkitehtuurit", "arkkitehtuurin", "arkkitehtuurien", "arkkitehtuuriin", "arkkitehtuuria"]),
+  withPrefix(maybe(subjectPrefix), ["viitekehys", "viitekehykset", "viitekehyksen", "viitekehysten", "viitekehykseen", "viitekehystä"]),
+  withPrefix(maybe(subjectPrefix), ["integraatio", "integraatiot", "integraation", "integraatioiden", "integraatioon", "integraatiota"]),
+  withPrefix(maybe(subjectPrefix), ["alusta", "alustat", "alustan", "alustojen", "alustaan", "alustaa"]),
+  withPrefix(maybe(subjectPrefix), ["prosessi", "prosessit", "prosessin", "prosessien", "prosessiin", "prosesssia"]),
+  withPrefix(maybe(subjectPrefix), ["järjestelmä", "järjestelmät", "järjestestelmän", "järjestelmien", "järjestelmään", "järjestelmää"])
 ])
 
 const buzzword = [
   "tekoäly",
-  "AI",
   "koneoppiminen",
-  "ML",
   "big data",
   "Hadoop",
   "MapReduce",
   "MongoDB",
   "Rails",
-  "PHP",
   "Scrum",
   "Kanban",
-  "SAFE",
-  "XP",
-  "API",
   "integraatiot",
   "rajapinnat",
   "alustatalous",
@@ -69,14 +99,13 @@ const buzzword = [
   "Ethereum",
   "Bitcoin",
   "Watson",
-  "JIRA",
-  "AWS",
   "DB2",
   "serverless",
   "Spring",
   "Azure",
   "Salesforce",
-  "SAP",
+  "digitalisaatio",
+  tla,
   [oneOf("API", "dev", "AI", "ML", "XML", "JSON", "REST", "SQL", "DB", "SOAP", "SAFE", "ledger", "coin"), "ops"]
 ]
 
@@ -89,17 +118,14 @@ const [verb] = wordList([
   ["kehittäminen"],
   ["rakentaminen"],
   ["ulkoistus"],
+  ["optimointi"],
   ["ketteröitys"],
+  ["kehitys"],
+  ["implementaatio"],
   ["kiihdytys"],
   ["estimointi"],
   ["monetisaatio"]
 ])
-
-const growth = oneOf(
-  "kasvu",
-  "growthi",
-  "kehitys"
-)
 
 const time = oneOf(
   "vuonna 2019",
@@ -120,7 +146,13 @@ const situation = oneOf(
   "logistiikassa",
   "Kelassa",
   "verotuksessa",
-  "julkishallinnossa"
+  "julkishallinnossa",
+  "konesalissa",
+  "pilvessä",
+  "prosessien automaatiossa",
+  "prosessiautomaatiossa",
+  "logistiikassa",
+  "taulukkolaskennassa"
 )
 
 const situationSuffix = [" ", situation]
@@ -153,22 +185,6 @@ const inOrganization = oneOf(
 
 const randomChar = () => String.fromCharCode(random('A'.charCodeAt(0), 'Z'.charCodeAt(0)))
 
-const tla = oneOf(
-  "API",
-  "JVM",
-  "KPI",
-  "ROI",
-  "SAP",
-  "JVM",
-  "BPA",
-  "CI",
-  "SVN",
-  "GNU",
-  "BS",
-  "CMDB",
-  "ITSM"
-)
-
 const randomAcronym = () =>
   range(0, random(2, 4))
     .map(randomChar)
@@ -190,19 +206,19 @@ const solutionLike = oneOf(
   "innovaatio"
 )
 
-const inEcosystem = oneOf(
+const inEcosystem = compoundFi(maybe(subjectPrefix), oneOf(
   "ekosysteemissä",
   "yhteisössä",
   "markkinassa",
   "ympäristössä"
-)
+))
 
-const [problem, toProblems] = wordList([
-  ["haaste", "haasteisiin"],
-  ["ongelma", "ongelmiin"],
-  ["kipupiste", "kipupisteisiin"],
-  ["kipukohta", "kipukohtiin"],
-  ["rajoite", "rajoitteisiin"]
+const [problem, problems, toProblems] = wordList([
+  ["haaste", "haasteet", "haasteisiin"],
+  ["ongelma", "ongelmat", "ongelmiin"],
+  ["kipupiste", "kipupisteet", "kipupisteisiin"],
+  ["kipukohta", "kipukohdat", "kipukohtiin"],
+  ["rajoite", "rajoitteet", "rajoitteisiin"]
 ])
 
 const rhetoricalQuestion = oneOf(
@@ -217,25 +233,28 @@ const rhetoricalQuestion = oneOf(
 const pattern = oneOf(
   t`${positiveAdjectivePluralPosessive} ${subjectPluralPosessive} ${positiveAdjective} ${verb}${maybe(situationSuffix)}`,
   t`${positiveAdjectivePossessive} ${subjectPossessive} ${positiveAdjective} ${verb}${maybe(situationSuffix)}`,
-  t`${oneOf(subjectPossessive, subjectPluralPosessive)}${maybeWord(positiveAdjective)}${verb}`,
+  t`${oneOf(subjectPossessive, subjectPluralPosessive)}${maybeWord(positiveAdjective)}${verb}${maybe(situationSuffix)}`,
   t`${buzzwords} - ${rhetoricalQuestion}`,
   t`${subjectLike} - ${subjectPossessive} ${oneOf('toinen', 'kolmas', 'neljäs')} ${oneOf('aalto', 'tuleminen', 'vaihe')}?`,
   t`${subjectLike} ${inOrganization}`,
   t`Esittelyssä ${oneOf(tla, randomAcronym)} - ${solutionLike} ${subjectPossessive} ${toProblems}?`,
   t`${subjectLike} vs ${subjectLike}`,
   t`${oneOf("Elements of", "Introduction to")} ${aBuzzword}`,
-  t`${maybe([oneOf("kun", "entä jos", "mitä jos"), " "])} ${aBuzzword} ei riitä - ${oneOf("miten", "kuinka")} ${oneOf("pärjätä", "selvitä", "menestyä")} ${thingToSupport} ${inEcosystem}?`,
+  t`${maybe([oneOf("kun", "entä jos", "entäs jos", "mitä jos"), " "])} ${aBuzzword} ei riitä - ${oneOf("miten", "kuinka")} ${oneOf("pärjätä", "selvitä", "menestyä")} ${thingToSupport} ${inEcosystem}?`,
   t`${aBuzzword} vie työt (mutta mahdollistaa vielä enemmän uutta)`,
+  t`Kohti ${positivePartitive} ${subjectPartitive}${maybe(t` - ${positiveAdverb}`)}`,
+  t`Kohti ${positivePartitive} ${subjectPartitive}${maybe(t` - ${oneOf("neuvoksi", "avuksi", "tueksi")} ${buzzwords}`)}`,
   [maybe([positiveAdjective, " "]), t`${subject} ${thingToSupport} ${asSupport}`],
-  [positiveAdjectivePlural, " ", subjectPlural, oneOf(
-    situationSuffix,
-    [" - ", positiveAdverb],
-    [" - ", rhetoricalQuestion],
-    [t` - ${solutionLike} ${toSubject}${maybe("?")}`]
-  )],
-  t`${buzzwords} ${situationSuffix}`
+  t`${positiveAdjectivePlural} ${subjectPlural} ${situationSuffix}`,
+  t`${positiveAdjectivePlural} ${subjectPlural} - ${positiveAdverb}${maybe(t` ja ${positiveAdverb}`)}`,
+  t`${positiveAdjectivePlural} ${subjectPlural} - ${rhetoricalQuestion}`,
+  t`${positiveAdjectivePlural} ${subjectPlural} - ${solutionLike} ${toSubject}${maybe("?")}`,
+  t`${buzzwords}${maybeWord(positiveInessive)}${situationSuffix}`,
+  t`${thingToSupport} ${problems} ja ${subjectLike}`,
 )
 
-const presentation = t`${pattern}\n${fullName}`
+const upperFirstT = lift(upperFirst)
+
+const presentation = t`${upperFirstT(pattern)}\n${fullName}`
 
 export const generatePresentation = () => upperFirst(evaluate(presentation))
