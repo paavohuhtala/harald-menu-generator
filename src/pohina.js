@@ -268,7 +268,7 @@ const presentationName = oneOf(
   t`${positiveAdjectivePlural} ${subjectPlural} - ${positiveAdverb}${maybe(t` ja ${positiveAdverb}`)}`,
   t`${positiveAdjectivePlural} ${subjectPlural} - ${rhetoricalQuestion}`,
   t`${positiveAdjectivePlural} ${subjectPlural} - ${solutionLike} ${toSubject}${maybe("?")}`,
-  t`${buzzwords}${maybeWordL(positiveInessive)} ${situation}`,
+  t`${buzzwords} ${situation}`,
   t`${thingToSupport} ${problems} ja ${subjectLike}`,
 )
 
@@ -292,7 +292,7 @@ const titleSubject = oneOf(
   "Innovation",
   "Automation",
   "Data Processing",
-  t`Business Process${maybeWordL("Automation", "Configuration", "Acceleration")}`,
+  t`Business Process${maybeWordL(oneOf("Automation", "Configuration", "Acceleration"))}`,
   "Service Management",
   "Operating",
   "Operations",
