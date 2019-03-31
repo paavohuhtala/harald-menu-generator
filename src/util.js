@@ -38,7 +38,7 @@ export const compoundFi = (a, b) => () => {
 
   const axLast = ax[ax.length - 1]
 
-  if (axLast !== '-' && bx.endsWith(axLast)) {
+  if (axLast !== '-' && bx.startsWith(axLast)) {
     return `${ax}-${bx}`
   } else {
     return `${ax}${bx}`
