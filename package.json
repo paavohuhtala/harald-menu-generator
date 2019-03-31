@@ -1,7 +1,6 @@
 {
   "name": "textgen",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "dev": "./node_modules/.bin/parcel ./src/main.html",

@@ -1,5 +1,8 @@
 module.exports = {
-  entry: ['./src/lambda.js'],
+  entry: {
+    harald: './src/harald-lambda.js',
+    pohina: './src/pohina-lambda.js'
+  },
   target: 'node',
   module: {
     rules: [
@@ -17,7 +20,7 @@ module.exports = {
   },  
   output: {
     path: `${process.cwd()}/bin`,
-    filename: 'index.js',
+    filename: '[name]/index.js',
     libraryTarget: 'umd'
   }
 };

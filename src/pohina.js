@@ -230,7 +230,7 @@ const rhetoricalQuestion = oneOf(
   "miksi?"
 )
 
-const pattern = oneOf(
+const presentationName = oneOf(
   t`${positiveAdjectivePluralPosessive} ${subjectPluralPosessive} ${positiveAdjective} ${verb}${maybe(situationSuffix)}`,
   t`${positiveAdjectivePossessive} ${subjectPossessive} ${positiveAdjective} ${verb}${maybe(situationSuffix)}`,
   t`${oneOf(subjectPossessive, subjectPluralPosessive)}${maybeWord(positiveAdjective)}${verb}${maybe(situationSuffix)}`,
@@ -255,6 +255,9 @@ const pattern = oneOf(
 
 const upperFirstT = lift(upperFirst)
 
-const presentation = t`${upperFirstT(pattern)}\n${fullName}`
-
-export const generatePresentation = () => upperFirst(evaluate(presentation))
+export const generatePresentation = () => ({
+  title: evaluate(upperFirstT(presentationName)),
+  author: {
+    name: evaluate(fullName)
+  }
+})
