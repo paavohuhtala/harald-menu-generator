@@ -4,6 +4,8 @@ import { wordList, prependAll, nOf, natListFi, mapAll, compoundFi } from "./util
 import { fullName } from "./name"
 
 const maybeWord = x => oneOf(" ", [" ", x, " "])
+const maybeWordL = x => oneOf(" ", [" ", x])
+const maybeWordR = x => oneOf("", [x, " "])
 
 const [positiveAdjective, positiveAdjectivePlural, positiveAdjectivePossessive, positiveAdjectivePluralPosessive, positiveAdverb, positivePartitive, positiveInessive] = wordList([
   ["kestävä", "kestävät", "kestävän", "kestävien", "kestävästi", "kestävää", "kestävässä"],
@@ -151,11 +153,8 @@ const situation = oneOf(
   "pilvessä",
   "prosessien automaatiossa",
   "prosessiautomaatiossa",
-  "logistiikassa",
   "taulukkolaskennassa"
 )
-
-const situationSuffix = [" ", situation]
 
 const thingToSupport = oneOf(
   "liiketoiminnan",
@@ -231,9 +230,9 @@ const rhetoricalQuestion = oneOf(
 )
 
 const presentationName = oneOf(
-  t`${positiveAdjectivePluralPosessive} ${subjectPluralPosessive} ${positiveAdjective} ${verb}${maybe(situationSuffix)}`,
-  t`${positiveAdjectivePossessive} ${subjectPossessive} ${positiveAdjective} ${verb}${maybe(situationSuffix)}`,
-  t`${oneOf(subjectPossessive, subjectPluralPosessive)}${maybeWord(positiveAdjective)}${verb}${maybe(situationSuffix)}`,
+  t`${positiveAdjectivePluralPosessive} ${subjectPluralPosessive} ${positiveAdjective} ${verb}${maybeWordL(situation)}`,
+  t`${positiveAdjectivePossessive} ${subjectPossessive} ${positiveAdjective} ${verb}${maybeWordL(situation)}`,
+  t`${oneOf(subjectPossessive, subjectPluralPosessive)}${maybeWord(positiveAdjective)}${verb}${maybeWordL(situation)}`,
   t`${buzzwords} - ${rhetoricalQuestion}`,
   t`${subjectLike} - ${subjectPossessive} ${oneOf('toinen', 'kolmas', 'neljäs')} ${oneOf('aalto', 'tuleminen', 'vaihe')}?`,
   t`${subjectLike} ${inOrganization}`,
@@ -244,12 +243,12 @@ const presentationName = oneOf(
   t`${aBuzzword} vie työt (mutta mahdollistaa vielä enemmän uutta)`,
   t`Kohti ${positivePartitive} ${subjectPartitive}${maybe(t` - ${positiveAdverb}`)}`,
   t`Kohti ${positivePartitive} ${subjectPartitive}${maybe(t` - ${oneOf("neuvoksi", "avuksi", "tueksi")} ${buzzwords}`)}`,
-  [maybe([positiveAdjective, " "]), t`${subject} ${thingToSupport} ${asSupport}`],
-  t`${positiveAdjectivePlural} ${subjectPlural}${situationSuffix}`,
+  t`${maybeWordR(positiveAdjective)}${subject} ${thingToSupport} ${asSupport}`,
+  t`${positiveAdjectivePlural} ${subjectPlural} ${situation}`,
   t`${positiveAdjectivePlural} ${subjectPlural} - ${positiveAdverb}${maybe(t` ja ${positiveAdverb}`)}`,
   t`${positiveAdjectivePlural} ${subjectPlural} - ${rhetoricalQuestion}`,
   t`${positiveAdjectivePlural} ${subjectPlural} - ${solutionLike} ${toSubject}${maybe("?")}`,
-  t`${buzzwords}${maybeWord(positiveInessive)}${situationSuffix}`,
+  t`${buzzwords}${maybeWord(positiveInessive)} ${situation}`,
   t`${thingToSupport} ${problems} ja ${subjectLike}`,
 )
 
