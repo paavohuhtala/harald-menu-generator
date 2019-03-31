@@ -265,7 +265,7 @@ const presentationName = oneOf(
   t`${positiveAdjectivePlural} ${subjectPlural} - ${positiveAdverb}${maybe(t` ja ${positiveAdverb}`)}`,
   t`${positiveAdjectivePlural} ${subjectPlural} - ${rhetoricalQuestion}`,
   t`${positiveAdjectivePlural} ${subjectPlural} - ${solutionLike} ${toSubject}${maybe("?")}`,
-  t`${buzzwords}${maybeWord(positiveInessive)} ${situation}`,
+  t`${buzzwords}${maybeWordL(positiveInessive)} ${situation}`,
   t`${thingToSupport} ${problems} ja ${subjectLike}`,
 )
 
