@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < 50; i++) {
       const elem = document.createElement("li")
       const presentation = generatePresentation() 
-      elem.innerText = `${presentation.title}\n${presentation.author.name}`
+      elem.innerText = `${presentation.title}\n${presentation.author.name}\n${presentation.author.title}`
       resultsUl.appendChild(elem)
     }
   }

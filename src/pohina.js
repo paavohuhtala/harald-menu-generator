@@ -1,10 +1,10 @@
 import { maybe, oneOf, evaluate, t, lift } from "./dsl"
-import { upperFirst, random, range } from "lodash/fp"
+import { upperFirst, random, range, startCase, nth } from "lodash/fp"
 import { wordList, prependAll, nOf, natListFi, mapAll, compoundFi } from "./util"
 import { fullName } from "./name"
 
 const maybeWord = x => oneOf(" ", [" ", x, " "])
-const maybeWordL = x => oneOf(" ", [" ", x])
+const maybeWordL = x => oneOf("", [" ", x])
 const maybeWordR = x => oneOf("", [x, " "])
 
 const [positiveAdjective, positiveAdjectivePlural, positiveAdjectivePossessive, positiveAdjectivePluralPosessive, positiveAdverb, positivePartitive, positiveInessive] = wordList([
@@ -84,36 +84,53 @@ const [subject, subjectPlural, subjectPossessive, subjectPluralPosessive, toSubj
   withPrefix(maybe(subjectPrefix), ["järjestelmä", "järjestelmät", "järjestestelmän", "järjestelmien", "järjestelmään", "järjestelmää"])
 ])
 
-const buzzword = [
-  "tekoäly",
-  "koneoppiminen",
+const buzzwordCommon = [
   "big data",
+  "data",
   "Hadoop",
   "MapReduce",
   "MongoDB",
   "Rails",
   "Scrum",
   "Kanban",
-  "integraatiot",
-  "rajapinnat",
-  "alustatalous",
-  "lohkoketjut",
   "Ethereum",
   "Bitcoin",
   "Watson",
   "DB2",
-  "serverless",
+  "Serverless",
   "Spring",
   "Azure",
   "Salesforce",
-  "digitalisaatio",
+  "Blockhain",
   tla,
   [oneOf("API", "dev", "AI", "ML", "XML", "JSON", "REST", "SQL", "DB", "SOAP", "SAFE", "ledger", "coin"), "ops"]
 ]
 
-const aBuzzword = oneOf(...buzzword)
+const buzzwordEn = [
+  ...buzzwordCommon,
+  "Integration",
+  "Platforms",
+  "Machine Learning",
+  "Artificial Intelligence",
+  "Application Programming Interface",
+  "Digitalization",
+]
 
-const buzzwords = () => natListFi(nOf(random(1, 4), buzzword))
+const buzzwordFi = [
+  ...buzzwordCommon,
+  "tekoäly",
+  "koneoppiminen",
+  "integraatiot",
+  "rajapinnat",
+  "alustatalous",
+  "lohkoketjut",
+  "digitalisaatio",
+  "konenäkö"
+]
+
+const aBuzzword = oneOf(...buzzwordFi)
+
+const buzzwords = () => natListFi(nOf(random(1, 4), buzzwordFi))
 
 const [verb] = wordList([
   ["integrointi"],
@@ -254,9 +271,101 @@ const presentationName = oneOf(
 
 const upperFirstT = lift(upperFirst)
 
+const seniorityPrefix = oneOf(
+  "Senior",
+  "Junior"
+)
+
+const rank = oneOf(
+  "Chief",
+  "Leading",
+  "Vice",
+  "Head"
+)
+
+const titleSubject = oneOf(
+  oneOf(...buzzwordEn),
+  "Outsourcing",
+  "Innovation",
+  "Automation",
+  "Data Processing",
+  t`Business Process${maybeWordL("Automation", "Configuration", "Acceleration")}`,
+  "Service Management",
+  "Operating",
+  "Operations",
+  "Quality",
+  "Customer Satisfaction",
+  "Profit",
+  "Process",
+  "Digital Business",
+  "Financial"
+)
+
+const baseTitle = oneOf(
+  "Manager",
+  "Officer",
+  "Director",
+  "Engineer",
+  "Evangelist",
+  "Architect",
+  "Consultant",
+  "Futurist",
+  "Analyst",
+  "Designer",
+  "Developer",
+  "Digitalist",
+  "Expert",
+  "Trainer",
+  "Innovationeer"
+)
+
+const bonusTitle = oneOf(
+  "TEDx speaker",
+  "journalist",
+  "writer",
+  "humanist",
+  "co-founder",
+  "lecturer",
+  "politician",
+  "Twitter user",
+  "biker",
+  "cyclist",
+  "Founder",
+  "Chairman",
+  "dad",
+  "mom",
+  "runner",
+  "vegan"
+)
+
+const bonusTitles = () => ", " + range(0, random(1, 3)).map(bonusTitle).map(evaluate).join(", ")
+
+const titleCase = lift(x => x.split(" ").map(upperFirst).join(" "))
+
+const acronymize = x => () => {
+  const fx = evaluate(x)
+
+  console.log(fx)
+
+  const acronym = fx.split(" ").map(nth(0)).join("")
+  return `${acronym} (${fx})`
+}
+
+const maybeMap = (f, x) => () => oneOf(
+  f(x),
+  x,
+)
+
+const title = [maybeMap(acronymize, titleCase(oneOf(
+  t`${maybeWordR(seniorityPrefix)}${maybeWordR(rank)}${titleSubject} ${baseTitle}`,
+  t`${maybeWordR(seniorityPrefix)}${baseTitle} of ${titleSubject}`,
+  t`${baseTitle}, ${titleSubject} department`
+))), maybe(bonusTitles)]
+
 export const generatePresentation = () => ({
   title: evaluate(upperFirstT(presentationName)),
   author: {
-    name: evaluate(fullName)
+    name: evaluate(fullName),
+    title: evaluate(title)
   }
 })
