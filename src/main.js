@@ -1,5 +1,4 @@
 
-import { generateMeal } from "./harald"
 import { generatePresentation } from "./pohina"
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -9,8 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     resultsUl.innerHTML = ""
     for (let i = 0; i < 50; i++) {
       const elem = document.createElement("li")
+
       const presentation = generatePresentation() 
-      elem.innerText = `${presentation.title}\n${presentation.author.name}\n${presentation.author.title}`
+      elem.innerText = `${presentation.title}\n${presentation.author.name}\n${presentation.author.title}\n${presentation.author.company}`
       resultsUl.appendChild(elem)
     }
   }

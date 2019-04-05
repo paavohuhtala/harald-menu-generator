@@ -1,7 +1,7 @@
-import { maybe, oneOf, evaluate, t, lift } from "./dsl"
-import { upperFirst, random, range, startCase, nth } from "lodash/fp"
+import { maybe, oneOf, evaluate, t, lift, oneOfCanRepeat, oneOfWeighted } from "./dsl"
+import { upperFirst, random, range, startCase, nth, findIndex } from "lodash/fp"
 import { wordList, prependAll, nOf, natListFi, mapAll, compoundFi } from "./util"
-import { fullName } from "./name"
+import { fullName, surname, firstName } from "./name"
 
 const maybeWord = x => oneOf(" ", [" ", x, " "])
 const maybeWordL = x => oneOf("", [" ", x])
@@ -118,6 +118,8 @@ const buzzwordEn = [
   "Application Programming Interface",
   "Digitalization",
 ]
+
+const aBuzzwordEn = oneOf(...buzzwordEn)
 
 const buzzwordFi = [
   ...buzzwordCommon,
@@ -363,10 +365,101 @@ const title = [maybeMap(acronymize, titleCase(oneOf(
   t`${baseTitle}, ${titleSubject} department`
 ))), maybe(bonusTitles)]
 
+const consonants = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']
+const aConsonant = oneOfCanRepeat(...consonants)
+
+const vocals = ['a', 'e', 'i', 'o', 'y', 'u']
+const aVocal = oneOfCanRepeat(...vocals)
+const pair = t`${aConsonant}${aVocal}`
+
+const companySuffixWord = oneOf(
+  'Group',
+  'Solutions',
+  'Innovations',
+  'Automation',
+  'Technology',
+  'Accounting',
+  'Agriculture',
+  'Manufacturng',
+  'Consulting',
+  'Software',
+  'Healthcare',
+  'Aerospace',
+  'Space',
+  'Visions',
+  'Digital',
+  'Defence',
+  'Network',
+  'Networks',
+  'Oil',
+  'Petrochemical',
+  'Bank',
+  'Real Estate',
+  'Flow',
+  'Insurance',
+  'Foods',
+  'Food',
+  'Nordic',
+  'Transport',
+  'Retail',
+  'Capital',
+  'Investing',
+  'Investment',
+  "Holdings"
+)
+
+const wordDerivedCompanyName = lift(word => {
+  const isConsonant = x => consonants.includes(x)
+  const isVocal = x => vocals.includes(x)
+
+  let i = 1;
+  for (; i < word.length; i++) {
+    const x = word[i]
+    const next = word[i + 1]
+    if (isConsonant(x) && (next === undefined || isVocal(next))) {
+      break
+    }
+  }
+
+  return t`${word.slice(0, i + 1)}${oneOf('ia', 'ita', 'ea')}`
+})(oneOf(aBuzzwordEn, companySuffixWord))
+
+const baseCompanyName = oneOf(
+  t`${pair}${pair}${pair}`,
+  surname,
+  firstName,
+  tla,
+  randomAcronym,
+  aBuzzwordEn,
+  wordDerivedCompanyName
+)
+
+const companySuffix = oneOf(
+  companySuffixWord
+)
+
+const companyType = oneOf(
+  "Inc",
+  "Corporation",
+  "Ltd",
+  "Oy",
+  "Oyj",
+  "Ky"
+)
+
+const companyName = titleCase(oneOfWeighted(
+  [100, t`${baseCompanyName} ${companySuffix}${maybeWordL(companyType)}`],
+  [5, t`${surname} ${companyType}`],
+  [2, t`${surname} & ${surname}`],
+))
+
+export const generateCompanyName = () => evaluate(companyName)
+
 export const generatePresentation = () => ({
   title: evaluate(upperFirstT(presentationName)),
   author: {
     name: evaluate(fullName),
-    title: evaluate(title)
+    title: evaluate(title),
+    company: evaluate(companyName)
   }
 })

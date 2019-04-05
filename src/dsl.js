@@ -1,4 +1,4 @@
-import { zip, concat, shuffle, isFunction, isString, isArray } from "lodash/fp"
+import { zip, concat, shuffle, isFunction, isString, isArray, sample, head, last, random, sum } from "lodash/fp"
 
 export const oneOf = (...items) => {
   let available = []
@@ -18,6 +18,18 @@ export const oneOf = (...items) => {
   return pickOne
 }
 
+export const oneOfCanRepeat = (...arr) => () => sample(arr)
+
+export const oneOfWeighted = (...arr) => {
+  const cdf = arr.map(head).reduce((acc, x) => [...acc, last(acc) + x], [0])
+  const total = sum(arr.map(head))
+
+  return () => {
+    const p = random(total, true)
+    const i = cdf.findIndex(x => x > p)
+    return arr[i - 1][1]
+  }
+}
 
 export const maybe = x => oneOf(x, "")
 export const compose = (f, pattern) => () => f(pattern())
