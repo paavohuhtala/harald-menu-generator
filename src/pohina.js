@@ -83,7 +83,7 @@ const [subject, subjectPlural, subjectPossessive, subjectPluralPosessive, subjec
   withPrefix(maybe(subjectPrefix), ["alusta", "alustat", "alustan", "alustojen", "alustaan", "alustaa", "alustasta"]),
   withPrefix(maybe(subjectPrefix), ["prosessi", "prosessit", "prosessin", "prosessien", "prosessiin", "prosesssia", "prosessista"]),
   withPrefix(maybe(subjectPrefix), ["järjestelmä", "järjestelmät", "järjestestelmän", "järjestelmien", "järjestelmään", "järjestelmää", "järjestelmästä"]),
-  withPrefix(maybe(subjectPrefix), ["arvoketju", "arvoketjut", "arvojetkun", "arvoketjujen", "arvoketjuun", "arvoketjua", "arvoketjusta"]),
+  withPrefix(maybe(subjectPrefix), ["arvoketju", "arvoketjut", "arvoketjun", "arvoketjujen", "arvoketjuun", "arvoketjua", "arvoketjusta"]),
   ["analytiikka", __, "analytiikan", __, "analytiikkaan", "analytiikkaa", "analytiikasta"],
   ["data", __, "datan", __, "dataan", "dataa", "datasta"],
   withPrefix(maybe(subjectPrefix), ["transformaatio", "transformaatiot", "transformaation", "transformaatioiden", "transformaatioon", "transforamatiota", "transformaatiosta"])
@@ -432,7 +432,7 @@ const wordDerivedCompanyName = lift(word => {
     }
   }
 
-  return t`${word.slice(0, i + 1)}${oneOf('ia', 'ita', 'ea')}`
+  return t`${word.slice(0, i + 1)}${oneOf('ia', 'ita', 'ea', 'ify')}`
 })(oneOf(aBuzzwordEn, companySuffixWord))
 
 const baseCompanyName = oneOf(
