@@ -44,8 +44,10 @@ export const evaluate = x => {
     return x
   } else if (isArray(x)) {
     return x.map(evaluate).join("")
+  } else {
+    return "UNDEFINED"
   }
 }
 
 export const t = (strings, ...exprs) =>
-  zip(strings, exprs).reduce(concat, [])
+  zip(strings, exprs).map(pair => pair.filter(x => x !== undefined)).reduce(concat, [])

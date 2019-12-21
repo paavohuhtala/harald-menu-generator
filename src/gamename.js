@@ -60,7 +60,10 @@ const place = oneOf(
     "prison",
     "office",
     "museum",
-    "earth"
+    "earth",
+    "restaurant",
+    "fortress",
+    "station"
 )
 
 const mechanicAdjectives = [
@@ -72,7 +75,8 @@ const mechanicAdjectives = [
     "groovy",
     "difficult",
     "complicated",
-    "casual"
+    "casual",
+    oneOf("inverse", "inverted")
 ]
 
 const mechanicAdjective = oneOf(...mechanicAdjectives)
@@ -97,7 +101,8 @@ const adjective = oneOf(
     "purple",
     "black",
     "white",
-    "gray",
+    "crimson",
+    oneOf("gray", "grey"),
     "ordinary",
     "extraordinary",
     "magical",
@@ -126,11 +131,18 @@ const adjective = oneOf(
     "norwegian",
     "american",
     "japanese",
-    "victorian"
+    "victorian",
+    "golden",
+    "platinum",
+    "bloody",
+    "gory"
 )
 
 const [anObject, objects, massNoun] = wordList([
     ["a memory", "memories", "memory"],
+    ["a crime", "crimes", "crime"],
+    ["a murder", "murders", "murder"],
+    ["a hug", "hugs", __],
     ["a conflict", "conflicts", __],
     ["a war", "wars", __],
     ["a friendship", "friendships", "friendship"],
@@ -138,10 +150,14 @@ const [anObject, objects, massNoun] = wordList([
     ["an island", "islands", __],
     ["a spell", "spells", __],
     ["a dance", "dances", "dance"],
-    ["a potion", "potions", "potion"],
+    ["a potion", "potions", __],
     ["an artifact", "artifacts", __],
     ["a sword", "swords", __],
     ["an axe", "axes", __],
+    ["a staff", "staves", __],
+    ["a hat", "hats", __],
+    ["a shield", "shields", __],
+    ["a gem", "gems", __],
     ["a goat", "goats", __],
     ["a dog", "dogs", __],
     ["a cat", "cats", __],
@@ -155,13 +171,24 @@ const [anObject, objects, massNoun] = wordList([
     ["an octopus", oneOf("octopuses", "octopi"), __],
     ["a fish", __, "fish"],
     ["a horse", "horses", __],
+    ["a snake", "snakes", __],
     ["a dad", "dads", __],
     ["a mom", "moms", __],
     ["a skull", "skulls", __],
     ["a soul", "souls", "soul"],
     ["a spreadsheet", "spreadsheets", __],
+    ["a stapler", "staplers", __],
     ["a civilization", "civilizations", __],
+    ["a hit", "hits", __],
+    ["a button", "buttons", __],
+    ["a joystick", "joysticks", __],
+    ["a crisis", "crises", __],
+    ["a sky", "skies", __],
+    ["a song", "songs", __],
+    ["a curse", "curses", __],
     [__, __, "gold"],
+    [__, __, "ice"],
+    [__, __, "fire"],
     [__, __, "loot"],
     [__, __, "violence"],
     [__, __, "peace"],
@@ -172,7 +199,7 @@ const [anObject, objects, massNoun] = wordList([
     [__, __, "doom"],
     [__, __, "warfare"],
     [__, __, "cereal"],
-    [__, __, "groove"],
+    [__, __, "groove"]
 ])
 
 const object = dropArticle(anObject)
@@ -204,29 +231,34 @@ const commonGameNameWord = oneOf(
     "Jousting",
     "Trigger",
     "Solid",
-    "Prime"
+    "Prime",
+    "Manager",
+    "Game",
+    "Clicker"
 )
 
 const gameNameSuffix = oneOfWeighted(
     [0.7, () => ` ${random(2, 7).toString()}`],
-    [0.5, " Saga"],
-    [0.5, " Story"],
-    [0.25, " Zero"],
+    [0.2, " Saga"],
+    [0.2, " Story"],
+    [0.2, " Zero"],
     [0.15, ": Reckoning"],
     [0.01, ": Revengence"],
-    [0.20, ": Revenge"],
+    [0.15, ": Revenge"],
     [0.15, ": Rebirth"],
-    [0.15, t`${oneOf(": ", " ")} Redemption`],
-    [0.15, t`: ${oneOf("Survivor", "Survive")}`],
+    [0.15, t`${oneOf(": ", " ")}Redemption`],
+    [0.2, t`: ${oneOf("Survivor", "Survive")}`],
     [0.1, ": Armageddon"],
-    [0.25, ": Afermath"],
-    [0.25, ": Endgame"],
-    [0.15, ": Awakening"],
+    [0.1, ": Afermath"],
+    [0.15, ": Endgame"],
+    [0.1, ": Awakening"],
     [0.4, t`${oneOf(": ", " ")}Remastered`],
     [0.1, ": Revision"],
     [0.4, t`${oneOf(": ", " ")}${oneOf("Episode", "Chapter")} ${() => random(0, 7).toString()}`],
-    [0.8, t`: ${adjective} ${massNoun}`],
+    [1, t`: ${adjective} ${massNoun}`],
     [0.2, " 64"],
+    [0.7, () => ` ${random(1980, 2020).toString()}`],
+    [0.3, t` ${oneOf("for", "of")} ${massNoun}${maybe([" and ", massNoun])}`]
 )
 
 const classicGame = oneOf(
@@ -238,23 +270,36 @@ const classicGame = oneOf(
     "Halo"
 )
 
+const objectPlace = t`${maybeR(object)}${place}`
+
+const placeName = oneOf(
+    t`Escape from ${maybeR(adjective)}${objectPlace}`,
+    t`Return to ${maybeR(adjective)}${objectPlace}`,
+    t`${object} of ${maybeR(adjective)}${objectPlace}`,
+    t`Mission to ${maybeR(adjective)}${objectPlace}`,
+    t`${objectPlace} ${oneOf("heist", "assault", "siege", "expedition", "raid")}`
+)
+
 const gameName = titleCasefy([
     maybeWeighted(0.05, gamePrefix),
     oneOfWeighted(
         [0.25, t`${maybeR(adjective)}${personTitle}'s ${maybeR(adjective)}${adventure}`],
         [0.25, t`${adjective} ${personTitle}`],
-        [0.25, t`The ${adjective} ${adventure}`],
-        [1.0, t`The ${adjective} ${oneOf(object, objects)}`],
+        [0.25, t`${maybeWeighted(0.3, "The ")}${adjective} ${adventure}`],
+        [1.0, t`${maybeWeighted(0.3), "The "}${adjective} ${oneOf(object, objects)}`],
         [0.1, t`Call of ${massNoun}`],
         [1.0, t`${adjective} ${massNoun}`],
         [0.25, t`${mechanicAdjective} ${classicGame}`],
         [0.25, t`${classicGame} ${genre}`],
         [0.25, t`Final ${genre}`],
-        [0.1, t`${titleCasefy(place)}Bound`],
+        [0.05, t`${titleCasefy(place)}Bound`],
+        [0.1, [maybe(t`${oneOf(firstNameEn, personTitle)}'s `), placeName]],
         [0.5, t`${object} ${object}`],
         [0.1, t`${lift(x => t`${x} ${x}`)(object)} Revolution`],
         [1.0, t`${maybeWeighted(0.05, ["My "])}${adjective} ${oneOf(object, objects, massNoun)}`],
         [1.0, t`${object} ${commonGameNameWord}`],
+        [1.0, t`${adjective} ${commonGameNameWord}`],
+        [1.0, t`${place} ${oneOf(object, objects)}`],
         [0.10, t`${oneOf(object, massNoun)} Simulator`],
         [0.10, t`${someAdventure} for ${oneOf(
             anObject,
