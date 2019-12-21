@@ -1,7 +1,8 @@
 module.exports = {
   entry: {
     harald: './src/harald-lambda.js',
-    pohina: './src/pohina-lambda.js'
+    pohina: './src/pohina-lambda.js',
+    gamename: './src/gamename-lambda.js',
   },
   target: 'node',
   module: {
