@@ -1,4 +1,4 @@
-import { oneOf, evaluate } from "./dsl"
+import { oneOf, evaluate, oneOfWeighted } from "./dsl"
 import { unzip, reject, eq, shuffle } from "lodash/fp"
 
 export const __ = Symbol("placeholder")
@@ -44,3 +44,5 @@ export const compoundFi = (a, b) => () => {
     return `${ax}${bx}`
   }
 }
+
+export const maybeWeighted = (likelihood, then) => oneOfWeighted([likelihood, then], [1, ""])

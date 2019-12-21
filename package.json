@@ -7,14 +7,14 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
-    "@babel/core": "7.1.6",
-    "@babel/preset-env": "7.1.6",
-    "babel-loader": "8.0.4",
-    "lodash": "4.17.11",
-    "parcel": "1.10.3",
-    "webpack": "4.25.1"
+    "@babel/core": "7.7.7",
+    "@babel/preset-env": "7.7.7",
+    "babel-loader": "8.0.6",
+    "lodash": "4.17.15",
+    "parcel": "1.12.4",
+    "webpack": "4.41.4"
   },
   "devDependencies": {
-    "webpack-cli": "^3.1.2"
+    "webpack-cli": "^3.3.10"
   }
 }

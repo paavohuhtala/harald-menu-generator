@@ -1,5 +1,5 @@
 
-import { generatePresentation } from "./pohina"
+import { generateGameName } from "./gamename"
 
 document.addEventListener("DOMContentLoaded", () => {
   const resultsUl = document.getElementById("results")
@@ -9,8 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < 50; i++) {
       const elem = document.createElement("li")
 
-      const presentation = generatePresentation() 
-      elem.innerText = `${presentation.title}\n${presentation.author.name}\n${presentation.author.title}\n${presentation.author.company}`
+      const gameName = generateGameName() 
+      elem.innerText = gameName
       resultsUl.appendChild(elem)
     }
   }
