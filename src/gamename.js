@@ -1,6 +1,6 @@
 import { maybe, oneOf, evaluate, t, lift, oneOfCanRepeat, oneOfWeighted } from "./dsl"
 import { random } from "lodash/fp"
-import { wordList, __, maybeWeighted } from "./util"
+import { wordList, __, maybeWeighted, prependReplace } from "./util"
 import { firstNameEn, fullNameEn } from "./name"
 
 const maybeR = x => oneOf("", [x, " "])
@@ -39,6 +39,9 @@ const genre = oneOf(
 
 const personTitle = oneOf(
     "king",
+    "queen",
+    "baron",
+    "lord",
     "knight",
     "hero",
     "villain",
@@ -47,7 +50,9 @@ const personTitle = oneOf(
     "architect",
     "builder",
     "peasant",
-    "dungeon master"
+    "dungeon master",
+    "rogue",
+    "thief"
 )
 
 const place = oneOf(
@@ -63,12 +68,15 @@ const place = oneOf(
     "earth",
     "restaurant",
     "fortress",
-    "station"
+    "station",
+    "city",
+    "village"
 )
 
 const mechanicAdjectives = [
     "fast",
     "slippery",
+    "sticky",
     "extreme",
     "flappy",
     "weird",
@@ -76,6 +84,9 @@ const mechanicAdjectives = [
     "difficult",
     "complicated",
     "casual",
+    "friendly",
+    "long",
+    "short",
     oneOf("inverse", "inverted")
 ]
 
@@ -131,11 +142,18 @@ const adjective = oneOf(
     "norwegian",
     "american",
     "japanese",
+    "russian",
+    "egyptian",
+    "chinese",
+    "icelandic",
+    "dutch",
+    "american",
     "victorian",
     "golden",
     "platinum",
     "bloody",
-    "gory"
+    "gory",
+    "elder"
 )
 
 const [anObject, objects, massNoun] = wordList([
@@ -164,6 +182,7 @@ const [anObject, objects, massNoun] = wordList([
     ["a panda", "pandas", __],
     ["a duck", "ducks", __],
     ["a goose", "geese", __],
+    ["a chicken", "chickens", __],
     ["a bear", "bears", __],
     ["a monster", "monsters", __],
     ["a zombie", "zombies", __],
@@ -186,6 +205,8 @@ const [anObject, objects, massNoun] = wordList([
     ["a sky", "skies", __],
     ["a song", "songs", __],
     ["a curse", "curses", __],
+    ["a shadow", "shadows", __],
+    ["a scroll", "scrolls", __],
     [__, __, "gold"],
     [__, __, "ice"],
     [__, __, "fire"],
@@ -199,7 +220,11 @@ const [anObject, objects, massNoun] = wordList([
     [__, __, "doom"],
     [__, __, "warfare"],
     [__, __, "cereal"],
-    [__, __, "groove"]
+    [__, __, "groove"],
+    [__, __, "revenge"],
+    [__, __, "hope"],
+    [__, __, "legacy"],
+    [__, __, "metal"]
 ])
 
 const object = dropArticle(anObject)
@@ -215,26 +240,30 @@ const anAdventure = oneOf(
 
 const adventure = dropArticle(anAdventure)
 
-const someAdventure = oneOfCanRepeat(anAdventure, t`The ${adventure}`)
+const someAdventure = oneOfCanRepeat(anAdventure, t`the ${adventure}`)
 
 const gamePrefix = oneOfWeighted(
     [1.0, "Super "],
     [0.2, t`${oneOf(firstNameEn, fullNameEn)}'s `],
     [0.15, t`${oneOf(firstNameEn, fullNameEn)} and `],
-    [0.05, "Sid Meier's "],
+    [0.02, "Sid Meier's "],
 )
 
 const commonGameNameWord = oneOf(
-    t`${maybe("Dance ")}Party`,
-    "Effect",
-    "Battle",
-    "Jousting",
-    "Trigger",
-    "Solid",
-    "Prime",
-    "Manager",
-    "Game",
-    "Clicker"
+    t`${maybe("dance ")}party`,
+    "effect",
+    "battle",
+    "jousting",
+    "trigger",
+    "solid",
+    "prime",
+    "manager",
+    "game",
+    "clicker",
+    "fight",
+    "club",
+    "battle",
+    "campaign"
 )
 
 const gameNameSuffix = oneOfWeighted(
@@ -263,11 +292,12 @@ const gameNameSuffix = oneOfWeighted(
 
 const classicGame = oneOf(
     "Tetris",
+    "Bejeweled",
     "Pac Man",
+    "Duck Hunt",
     "Chess",
     "Mario",
-    "Sonic",
-    "Halo"
+    "Sonic"
 )
 
 const objectPlace = t`${maybeR(object)}${place}`
@@ -280,33 +310,41 @@ const placeName = oneOf(
     t`${objectPlace} ${oneOf("heist", "assault", "siege", "expedition", "raid")}`
 )
 
+const baseGamePattern = oneOfWeighted(
+    [0.25, t`${maybeR(adjective)}${personTitle}'s ${maybeR(adjective)}${adventure}`],
+    [0.25, t`${personTitle}'s ${maybeR(adjective)} revenge`],
+    [0.25, t`${adjective} ${personTitle}`],
+    [0.25, t`${maybeWeighted(0.3, "the ")}${adjective} ${adventure}`],
+    [1.0, t`${maybeWeighted(0.3), "the "}${adjective} ${oneOf(object, objects)}`],
+    [0.1, t`Call of ${massNoun}`],
+    [1.0, t`${adjective} ${massNoun}`],
+    [0.25, t`${mechanicAdjective} ${classicGame}`],
+    [0.25, t`${classicGame} ${genre}`],
+    [0.25, t`Final ${genre}`],
+    [0.05, t`${titleCasefy(place)}Bound`],
+    [0.1, [maybe(t`${oneOf(firstNameEn, personTitle)}'s `), placeName]],
+    [0.5, t`${object} ${object}`],
+    [0.25, t`${object} ${oneOf("&", "and", "or")} ${object}`],
+    [0.25, t`${massNoun} ${oneOf("&", "and", "or")} ${massNoun}`],
+    [0.05, t`${lift(x => t`${x} ${x}`)(object)} Revolution`],
+    [1.0, t`${maybeWeighted(0.05, ["My "])}${adjective} ${oneOf(object, objects, massNoun)}`],
+    [1.0, t`${object} ${commonGameNameWord}`],
+    [1.0, t`${adjective} ${commonGameNameWord}`],
+    [1.0, t`${place} ${oneOf(object, objects)}`],
+    [0.10, t`${oneOf(object, massNoun)} Simulator`],
+    [0.10, t`${someAdventure} for ${oneOf(
+        anObject,
+        ["the ", maybeR(adjective), oneOf(object, objects)],
+    )}`]
+)
+
 const gameName = titleCasefy([
-    maybeWeighted(0.05, gamePrefix),
-    oneOfWeighted(
-        [0.25, t`${maybeR(adjective)}${personTitle}'s ${maybeR(adjective)}${adventure}`],
-        [0.25, t`${adjective} ${personTitle}`],
-        [0.25, t`${maybeWeighted(0.3, "The ")}${adjective} ${adventure}`],
-        [1.0, t`${maybeWeighted(0.3), "The "}${adjective} ${oneOf(object, objects)}`],
-        [0.1, t`Call of ${massNoun}`],
-        [1.0, t`${adjective} ${massNoun}`],
-        [0.25, t`${mechanicAdjective} ${classicGame}`],
-        [0.25, t`${classicGame} ${genre}`],
-        [0.25, t`Final ${genre}`],
-        [0.05, t`${titleCasefy(place)}Bound`],
-        [0.1, [maybe(t`${oneOf(firstNameEn, personTitle)}'s `), placeName]],
-        [0.5, t`${object} ${object}`],
-        [0.1, t`${lift(x => t`${x} ${x}`)(object)} Revolution`],
-        [1.0, t`${maybeWeighted(0.05, ["My "])}${adjective} ${oneOf(object, objects, massNoun)}`],
-        [1.0, t`${object} ${commonGameNameWord}`],
-        [1.0, t`${adjective} ${commonGameNameWord}`],
-        [1.0, t`${place} ${oneOf(object, objects)}`],
-        [0.10, t`${oneOf(object, massNoun)} Simulator`],
-        [0.10, t`${someAdventure} for ${oneOf(
-            anObject,
-            ["the ", maybeR(adjective), oneOf(object, objects)],
-        )}`]
+    prependReplace(
+        maybeWeighted(0.1, gamePrefix),
+        "the ",
+        baseGamePattern
     ),
-    maybeWeighted(0.25, [gameNameSuffix])]
+    maybeWeighted(0.25, gameNameSuffix)]
 )
 
 export const generateGameName = () => evaluate(gameName)

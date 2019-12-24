@@ -46,3 +46,9 @@ export const compoundFi = (a, b) => () => {
 }
 
 export const maybeWeighted = (likelihood, then) => oneOfWeighted([likelihood, then], [1, ""])
+
+export const prependReplace = (left, pattern, right) => () => {
+  const leftE = evaluate(left)
+  const rightE = evaluate(right)
+  return rightE.startsWith(pattern) ? rightE.replace(pattern, leftE) : [leftE, rightE]
+}
